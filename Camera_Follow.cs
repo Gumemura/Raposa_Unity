@@ -5,6 +5,7 @@ using UnityEngine;
 public class Camera_Follow : MonoBehaviour
 {
     public Transform jogador;
+    public float z;
 
     Transform posicao_Camera;
 
@@ -15,6 +16,6 @@ public class Camera_Follow : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        posicao_Camera.position = new Vector3(jogador.position.x, 0, -10); 
+        posicao_Camera.position = new Vector3(jogador.position.x, 0, z); 
     }
 }
