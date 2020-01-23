@@ -16,6 +16,7 @@ public class Movimento : MonoBehaviour
     Rigidbody2D rb_2d;
     SpriteRenderer m_SpriteRenderer;
     Animator animator;
+    RaycastHit2D raycast;
     
     float horizontalInput;
     bool pode_pular;
@@ -37,8 +38,16 @@ public class Movimento : MonoBehaviour
     }
 
     void FixedUpdate(){
+        //Cria um raio que parte do rigidbody e detecta colisoes
+        raycast = Physics2D.BoxCast(colisor_2D.bounds.center, colisor_2D.bounds.size, .0f, Vector2.down, .08f, chao);
+
         Movimento_X();
         Pulo();
+    }
+
+    //Verifica de o objeto esta em contato com o LayerMask "chao". Serve para permitir que o objeto apenas pule quando em contato com o chao
+    bool contato_chao(){
+        return raycast.collider != null;
     }
 
     bool Agachadinho(){
@@ -56,6 +65,8 @@ public class Movimento : MonoBehaviour
     }
 
     bool Movimento_X(){
+        int alterador = 1;
+
         if(Agachadinho() == false){
             //Esse if é importante pois faz com que o objeto se mova apenas e somente apenas nos frames em que o botao estiver sendo apertado
             if(Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow)){
@@ -64,13 +75,17 @@ public class Movimento : MonoBehaviour
 
                 //Rotaciona o Sprite
                 if(Input.GetAxis("Horizontal") < 0){
+                    alterador = -1;
                     m_SpriteRenderer.flipX = true;
                 }else{
+                    alterador = 1; 
                     m_SpriteRenderer.flipX = false;
                 }
 
                 //Move o objeto
-                transform.Translate(horizontalInput * Time.deltaTime, 0, 0, Space.Self);
+                //transform.Translate(horizontalInput * Time.deltaTime, 0, 0, Space.Self);
+
+                rb_2d.velocity = new Vector2(velocidade * alterador, rb_2d.velocity.y);
             }else{
                 //desliga bool 'correr'
                 animator.SetBool("corre", false);
@@ -81,12 +96,6 @@ public class Movimento : MonoBehaviour
     }
 
     void Pulo(){
-        //Verifica de o objeto esta em contato com o LayerMask "chao". Serve para permitir que o objeto apenas pule quando em contato com o chao
-        bool contato_chao(){
-            RaycastHit2D raycast  = Physics2D.BoxCast(colisor_2D.bounds.center, colisor_2D.bounds.size, .0f, Vector2.down, .08f, chao);
-            return raycast.collider != null;
-        }
-
         //Aumentando a velocidade de subida
         if(pode_pular && contato_chao()){
             rb_2d.velocity = Vector2.up * pulo;
